@@ -38,6 +38,9 @@ def quick_plot_histo(variable: iter, number_of_bins: int = 5000):
     fig, ax = plt.subplots(tight_layout=True)
     # We can set the number of bins with the `bins` kwarg
     ax.hist(variable, bins=number_of_bins)
+    ax.set_xlabel('UTR Length')
+    ax.set_ylabel('Number of Reads')
+    ax.set_title('')
     plt.show()
 
 
@@ -57,21 +60,33 @@ if __name__ == '__main__':
     # Quick Filter!
     df_plus = df[df.sense == '+']
     df_minus = df[df.sense == '-']
+    df_reduced_max = df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
 
     # # Print first 50 rows
     # print(df_plus.head(50))
     # print(df_minus.head(50))
 
-    # Print average, max & min UTR length
-    print(f'UTR Length Max: {df.UTR_length.max():}')
-    print(f'UTR Length Average: {df.UTR_length.mean():.2f}')
-    print(f'UTR Length Min: {df.UTR_length.min():}')
+    # # Print average, max & min UTR length
+    # print(f'UTR Length Max: {df.UTR_length.max():}')
+    # print(f'UTR Length Average: {df.UTR_length.mean():.2f}')
+    # print(f'UTR Length Min: {df.UTR_length.min():}')
 
-    # Look at ends of UTRs
-    for UTR in df_plus['UTR_sequence'].head(50).values:
-        print(f'{UTR[-50:]:.>50}')
-    print('*' * 50)
-    for UTR in df_minus['UTR_sequence'].head(50).values:
-        print(f'{UTR[:50]:.<50}')
+    # Print basics for each plus and minus
+    print(f'All UTRs:\n\tMax Length:{df.UTR_length.max():>6}\n\t'
+          f'Min Length:{df.UTR_length.min():>6}\n\t'
+          f'\t\tN = {df.size}')
+    print(f'Antisense UTRs:\n\tMax Length:{df_minus.UTR_length.max():>6}\n\t'
+          f'Min Length:{df_minus.UTR_length.min():>6}\n\t'
+          f'\t\tN= {df_minus.size}')
+    print(f'Sense UTRs:\n\tMax Length:{df_plus.UTR_length.max():>6}\n\t'
+          f'Min Length:{df_plus.UTR_length.min():>6}\n\t'
+          f'\t\tN= {df_plus.size}')
 
-    # quick_plot_histo(df['UTR_length'])
+    # # Look at ends of UTRs
+    # for UTR in df_plus['UTR_sequence'].head(50).values:
+    #     print(f'{UTR[-50:]:.>50}')
+    # print('*' * 50)
+    # for UTR in df_minus['UTR_sequence'].head(50).values:
+    #     print(f'{UTR[:50]:.<50}')
+
+    quick_plot_histo(df['UTR_length'], number_of_bins=100)
