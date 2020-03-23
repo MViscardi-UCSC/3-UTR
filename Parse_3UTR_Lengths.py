@@ -14,6 +14,10 @@ For the initial parsing (with this script), lets just try to iterate through the
 All that is really needed for this initial run through is the EntrezID and the UTR_length
 """
 
+import numpy
+
+line_limit = 100
+
 if __name__ == '__main__':
     with open("NIHMS249209-supplement-5.txt", 'r') as file:
         parsed_line_count = 0
@@ -21,5 +25,13 @@ if __name__ == '__main__':
         for line in file:
             if line.startswith('#'):
                 continue
+            elif parsed_line_count < line_limit:
+                split_line = line.split('\t')
+                print(f'\tEntrenz ID:{split_line[0]:>7}\t\tUTR Length:{split_line[6]:>4}')
+                ID_and_Lengths.append((split_line[0], split_line[6]))
+                parsed_line_count+=1
             else:
+                print(f'Line limit of {line_limit} lines reached.')
+                avg_UTR_Length = '...'  # TODO: Fix this! with numpy?
+                break
 
