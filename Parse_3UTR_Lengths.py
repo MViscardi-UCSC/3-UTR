@@ -51,23 +51,27 @@ if __name__ == '__main__':
     # because I don't know how else to get rid of hash-tag in front of IDs
     df.columns = column_headers
 
+    # Convert sense or antisense to a category -- might make stuff faster?
     df['sense'] = df['sense'].astype('category')
 
-    # Print first 50 rows
-    print(df.head(50))
+    # Quick Filter!
+    df_plus = df[df.sense == '+']
+    df_minus = df[df.sense == '-']
+
+    # # Print first 50 rows
+    # print(df_plus.head(50))
+    # print(df_minus.head(50))
 
     # Print average, max & min UTR length
-    print(f'UTR Length Max: {df["UTR_length"].max():}')
-    print(f'UTR Length Average: {df["UTR_length"].mean():.2f}')
-    print(f'UTR Length Min: {df["UTR_length"].min():}')
-
-    # Filtering out + or - strand UTRs
-    # I HAVE NO IDEA HOW TO DO THIS
+    print(f'UTR Length Max: {df.UTR_length.max():}')
+    print(f'UTR Length Average: {df.UTR_length.mean():.2f}')
+    print(f'UTR Length Min: {df.UTR_length.min():}')
 
     # Look at ends of UTRs
-    # for UTR in df['UTR_sequence'].head(50).values:
-    #     print(f'{UTR[-50:]:.>50}')
-    #     # Realized this isn't totally working,
-    #     # big issue is that some are antisense!
+    for UTR in df_plus['UTR_sequence'].head(50).values:
+        print(f'{UTR[-50:]:.>50}')
+    print('*' * 50)
+    for UTR in df_minus['UTR_sequence'].head(50).values:
+        print(f'{UTR[:50]:.<50}')
 
     # quick_plot_histo(df['UTR_length'])
