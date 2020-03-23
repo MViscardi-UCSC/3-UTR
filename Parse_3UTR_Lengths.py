@@ -51,10 +51,23 @@ if __name__ == '__main__':
     # because I don't know how else to get rid of hash-tag in front of IDs
     df.columns = column_headers
 
+    df['sense'] = df['sense'].astype('category')
+
     # Print first 25 rows
-    # print(df.head(25))
+    print(df.head(25))
 
-    # Print average UTR length
+    # Print average, max & min UTR length
+    print(f'UTR Length Max: {df["UTR_length"].max():}')
     print(f'UTR Length Average: {df["UTR_length"].mean():.2f}')
+    print(f'UTR Length Min: {df["UTR_length"].min():}')
 
-    quick_plot_histo(df['UTR_length'])
+    # Filtering out + or - strand UTRs
+    # I HAVE NO IDEA HOW TO DO THIS
+
+    # Look at ends of UTRs
+    # for UTR in df['UTR_sequence'].head(50).values:
+    #     print(f'{UTR[-50:]:.>50}')
+    #     # Realized this isn't totally working,
+    #     # big issue is that some are antisense!
+
+    # quick_plot_histo(df['UTR_length'])
