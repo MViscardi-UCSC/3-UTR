@@ -10,7 +10,7 @@ The data is stored as a .txt file with tab separated values corresponding to:
     Entrez_ID	UTR_type	chromosome	sense	UTR_start	cleavage_site	UTR_length
     	intron_starts(comma_separted)	intron_ends(comma_separted)	UTR_sequence
 For the initial parsing (with this script), lets just try to iterate through the first thousand or so data points,
-    store them within a numpy array, and try to plot them in some distinguishable way
+    store them within a pandas array, and try to plot them in some distinguishable way
 All that is really needed for this initial run through is the EntrezID and the UTR_length
 """
 import matplotlib.pyplot as plt
@@ -60,7 +60,8 @@ if __name__ == '__main__':
     # Quick Filter!
     df_plus = df[df.sense == '+']
     df_minus = df[df.sense == '-']
-    df_reduced_max = df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
+    # Reduce any UTRs longer than 1500nt to 1500 nt
+    df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
 
     # # Print first 50 rows
     # print(df_plus.head(50))
