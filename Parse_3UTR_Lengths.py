@@ -33,26 +33,28 @@ column_headers = ['entrez_ID',
                   'UTR_sequence',
                   ]
 
-if __name__ == '__main__':
 
+def quick_plot_histo(variable: iter, number_of_bins: int = 5000):
+    fig, ax = plt.subplots(tight_layout=True)
+    # We can set the number of bins with the `bins` kwarg
+    ax.hist(variable, bins=number_of_bins)
+    plt.show()
+
+
+if __name__ == '__main__':
+    # Open file and store into Pandas dataframe
     with open("NIHMS249209-supplement-5.txt", "r") as file:
         # This is a huge step. Pandas quickly converts the whole text file into a Dataframe
         df = pd.read_csv(file, sep='\t', header=3)
 
-    # Rename the columns because I don't know how else to get rid of hash-tag in front of
+    # Rename the columns...
+    # because I don't know how else to get rid of hash-tag in front of IDs
     df.columns = column_headers
-    # print(df[['entrez_ID', 'UTR_length']])
-    print(df.head(25))
+
+    # Print first 25 rows
+    # print(df.head(25))
+
+    # Print average UTR length
     print(f'UTR Length Average: {df["UTR_length"].mean():.2f}')
-    # Check the types of each column
-    # for i in column_headers:
-    #    print(f'{i}: {df[i].dtype}')
 
-    # Plot it!
-    num_bins = 1000
-
-    fig, ax = plt.subplots(tight_layout=True)
-
-    # We can set the number of bins with the `bins` kwarg
-    ax.hist(df['UTR_length'], bins=num_bins)
-    plt.show()
+    quick_plot_histo(df['UTR_length'])
