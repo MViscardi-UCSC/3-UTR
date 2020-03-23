@@ -57,11 +57,12 @@ if __name__ == '__main__':
     # Convert sense or antisense to a category -- might make stuff faster?
     df['sense'] = df['sense'].astype('category')
 
+    # Reduce any UTRs longer than 1500nt to 1500 nt
+    df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
+
     # Quick Filter!
     df_plus = df[df.sense == '+']
     df_minus = df[df.sense == '-']
-    # Reduce any UTRs longer than 1500nt to 1500 nt
-    df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
 
     # # Print first 50 rows
     # print(df_plus.head(50))
@@ -90,4 +91,4 @@ if __name__ == '__main__':
     # for UTR in df_minus['UTR_sequence'].head(50).values:
     #     print(f'{UTR[:50]:.<50}')
 
-    quick_plot_histo(df['UTR_length'], number_of_bins=100)
+    quick_plot_histo([df['UTR_length']], number_of_bins=100)
