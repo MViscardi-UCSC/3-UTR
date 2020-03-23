@@ -13,7 +13,7 @@ For the initial parsing (with this script), lets just try to iterate through the
     store them within a numpy array, and try to plot them in some distinguishable way
 All that is really needed for this initial run through is the EntrezID and the UTR_length
 """
-
+import matplotlib.pyplot as plt
 import pandas as pd
 # Pandas default would cut off basically all the columns so:
 pd.set_option('display.max_rows', 500)
@@ -36,11 +36,23 @@ column_headers = ['entrez_ID',
 if __name__ == '__main__':
 
     with open("NIHMS249209-supplement-5.txt", "r") as file:
-
         # This is a huge step. Pandas quickly converts the whole text file into a Dataframe
         df = pd.read_csv(file, sep='\t', header=3)
-        # Rename the columns because I don't know how else to get rid of hash-tag in front of
-        df.columns = column_headers
-        print(df[['entrez_ID', 'UTR_length']])
-        print(f'UTR Length Average: {df["UTR_length"].mean():.2f}')
 
+    # Rename the columns because I don't know how else to get rid of hash-tag in front of
+    df.columns = column_headers
+    # print(df[['entrez_ID', 'UTR_length']])
+    print(df.head(25))
+    print(f'UTR Length Average: {df["UTR_length"].mean():.2f}')
+    # Check the types of each column
+    # for i in column_headers:
+    #    print(f'{i}: {df[i].dtype}')
+
+    # Plot it!
+    num_bins = 1000
+
+    fig, ax = plt.subplots(tight_layout=True)
+
+    # We can set the number of bins with the `bins` kwarg
+    ax.hist(df['UTR_length'], bins=num_bins)
+    plt.show()
