@@ -53,8 +53,8 @@ if __name__ == '__main__':
 
     df['sense'] = df['sense'].astype('category')
 
-    # Print first 25 rows
-    print(df.head(25))
+    # Print first 50 rows
+    print(df.head(50))
 
     # Print average, max & min UTR length
     print(f'UTR Length Max: {df["UTR_length"].max():}')
