@@ -103,4 +103,4 @@ if __name__ == '__main__':
     info_print_df(df, title="Max Cut UTRs")
 
     # Plot histogram
-    quick_plot_histo([df['UTR_length']], number_of_bins=500, maximum=1500)
+    quick_plot_histo([df['UTR_length']], number_of_bins=150, maximum=1500)
