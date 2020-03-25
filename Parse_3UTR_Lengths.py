@@ -41,7 +41,7 @@ def make_pandas_df(file, sep='\t', header=3):
     return df
 
 
-def mess_w_df(df, columnheaders, max_value):
+def mess_w_df(df, column_headers, max_value):
     # Rename the columns...
     # because I don't know how else to get rid of hash-tag in front of IDs
     df.columns = column_headers
@@ -76,12 +76,15 @@ def filter_sense(df):
     return sense, anti_sense
 
 
-def quick_plot_histo(variable: iter, number_of_bins: int = 5000, maximum: int = None):
+def quick_plot_histo(variable: iter,
+                     number_of_bins: int = 5000,
+                     maximum: int = None):
     fig, ax = plt.subplots(tight_layout=True)
     # We can set the number of bins with the `bins` kwarg
     ax.hist(variable, bins=number_of_bins)
     if maximum:
-        ax.set_xlabel(f'UTR Length,\nin {number_of_bins} bins, with cut-off at {maximum}nt')
+        ax.set_xlabel(f'UTR Length,\nin {number_of_bins} bins,'
+                      f'with cut-off at {maximum}nt')
     else:
         ax.set_xlabel(f'UTR Length,\nin {number_of_bins} bins')
     ax.set_ylabel('Number of Reads')
@@ -102,8 +105,12 @@ if __name__ == '__main__':
     # Print basics post max cut off
     info_print_df(df, title="Max Cut UTRs")
 
+    # Going to try and pre-bin data,
+    # this will allow for an eventual simple moving average to plot as a line
+    print(pd.cut(df.UTR_length, bins=150).value_counts())
+
     # Print 0 value reads
-    print(df[df.UTR_length == 0])
+    # print(df[df.UTR_length == 0])
 
     # Plot histogram
     quick_plot_histo([df['UTR_length']], number_of_bins=150, maximum=1500)
