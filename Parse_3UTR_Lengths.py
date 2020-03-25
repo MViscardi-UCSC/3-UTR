@@ -34,22 +34,14 @@ column_headers = ['entrez_ID',
                   ]
 
 
-def quick_plot_histo(variable: iter, number_of_bins: int = 5000):
-    fig, ax = plt.subplots(tight_layout=True)
-    # We can set the number of bins with the `bins` kwarg
-    ax.hist(variable, bins=number_of_bins)
-    ax.set_xlabel('UTR Length')
-    ax.set_ylabel('Number of Reads')
-    ax.set_title('')
-    plt.show()
-
-
-if __name__ == '__main__':
-    # Open file and store into Pandas dataframe
-    with open("NIHMS249209-supplement-5.txt", "r") as file:
+def make_pandas_df(file, sep='\t', header=3):
+    with open(file, "r") as file:
         # This is a huge step. Pandas quickly converts the whole text file into a Dataframe
-        df = pd.read_csv(file, sep='\t', header=3)
+        df = pd.read_csv(file, sep=sep, header=header)
+    return df
 
+
+def mess_w_df(df, columnheaders, max_value):
     # Rename the columns...
     # because I don't know how else to get rid of hash-tag in front of IDs
     df.columns = column_headers
@@ -58,37 +50,57 @@ if __name__ == '__main__':
     df['sense'] = df['sense'].astype('category')
 
     # Reduce any UTRs longer than 1500nt to 1500 nt
-    df.loc[df.UTR_length >= 1500, 'UTR_length'] = 1500
+    df.loc[df.UTR_length >= max_value, 'UTR_length'] = max_value
 
-    # Quick Filter!
-    df_plus = df[df.sense == '+']
-    df_minus = df[df.sense == '-']
+    return df
 
-    # # Print first 50 rows
-    # print(df_plus.head(50))
-    # print(df_minus.head(50))
 
-    # # Print average, max & min UTR length
-    # print(f'UTR Length Max: {df.UTR_length.max():}')
-    # print(f'UTR Length Average: {df.UTR_length.mean():.2f}')
-    # print(f'UTR Length Min: {df.UTR_length.min():}')
+def head_print_df(df, head=50):
+    print(df.head(head))
 
-    # Print basics for each plus and minus
-    print(f'All UTRs:\n\tMax Length:{df.UTR_length.max():>6}\n\t'
-          f'Min Length:{df.UTR_length.min():>6}\n\t'
-          f'\t\tN = {df.size}')
-    print(f'Antisense UTRs:\n\tMax Length:{df_minus.UTR_length.max():>6}\n\t'
-          f'Min Length:{df_minus.UTR_length.min():>6}\n\t'
-          f'\t\tN= {df_minus.size}')
-    print(f'Sense UTRs:\n\tMax Length:{df_plus.UTR_length.max():>6}\n\t'
-          f'Min Length:{df_plus.UTR_length.min():>6}\n\t'
-          f'\t\tN= {df_plus.size}')
 
-    # # Look at ends of UTRs
-    # for UTR in df_plus['UTR_sequence'].head(50).values:
-    #     print(f'{UTR[-50:]:.>50}')
-    # print('*' * 50)
-    # for UTR in df_minus['UTR_sequence'].head(50).values:
-    #     print(f'{UTR[:50]:.<50}')
+def info_print_df(df, title: str = ''):
+    if title:
+        print(f'{title}:\n\tMax Length:{df.UTR_length.max():>6}\n\t'
+              f'Min Length:{df.UTR_length.min():>6}\n\t'
+              f'\t\tN = {df.size}')
+    else:
+        print(f'\n\tMax Length:{df.UTR_length.max():>6}\n\t'
+              f'Min Length:{df.UTR_length.min():>6}\n\t'
+              f'\t\tN = {df.size}')
 
-    quick_plot_histo([df['UTR_length']], number_of_bins=100)
+
+def filter_sense(df):
+    sense = df[df.sense == '+']
+    anti_sense = df[df.sense == '-']
+    return sense, anti_sense
+
+
+def quick_plot_histo(variable: iter, number_of_bins: int = 5000, maximum: int = None):
+    fig, ax = plt.subplots(tight_layout=True)
+    # We can set the number of bins with the `bins` kwarg
+    ax.hist(variable, bins=number_of_bins)
+    if maximum:
+        ax.set_xlabel(f'UTR Length,\nin {number_of_bins} bins, with cut-off at {maximum}nt')
+    else:
+        ax.set_xlabel(f'UTR Length,\nin {number_of_bins} bins')
+    ax.set_ylabel('Number of Reads')
+    ax.set_title("3' UTR reads from C.H. Jan et al. 2010")
+    plt.show()
+
+
+if __name__ == '__main__':
+    # Open file and store into Pandas data-frame
+    df = make_pandas_df("NIHMS249209-supplement-5.txt")
+
+    # Print basics
+    info_print_df(df, title="All UTRs")
+
+    # Fix headers, try to simplify data-types, pool anything above max to max
+    df = mess_w_df(df, column_headers, max_value=1500)
+
+    # Print basics post max cut off
+    info_print_df(df, title="Max Cut UTRs")
+
+    # Plot histogram
+    quick_plot_histo([df['UTR_length']], number_of_bins=500, maximum=1500)
