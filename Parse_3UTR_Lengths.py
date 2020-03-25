@@ -102,5 +102,8 @@ if __name__ == '__main__':
     # Print basics post max cut off
     info_print_df(df, title="Max Cut UTRs")
 
+    # Print 0 value reads
+    print(df[df.UTR_length == 0])
+
     # Plot histogram
     quick_plot_histo([df['UTR_length']], number_of_bins=150, maximum=1500)
