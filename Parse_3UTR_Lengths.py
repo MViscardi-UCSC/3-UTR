@@ -94,13 +94,26 @@ def quick_plot_histo(variable: iter,
 
 
 def bin_and_plot_df(df, num_bins):
-    binned_series = pd.cut(df.UTR_length, bins=150, labels=range(1, 151)).value_counts()
+    """"""
+    # Tuple with the range of numbers that are basically the indexes of our bins
+    index_list = range(1, num_bins+1)
+    binned_series = pd.cut(df.UTR_length, bins=num_bins, labels=index_list).value_counts()
     binned_ordered_series = binned_series.sort_index()
+
+    rolling_average = binned_ordered_series.rolling(10, min_periods=1).mean()
+    print(rolling_average)
+
     binned_ordered_list = binned_ordered_series.values
+
+    # print(binned_series, binned_ordered_series, binned_ordered_list)
+
+    bin_factor = int(df.UTR_length.max() / num_bins)
 
     # Plot Binned Data!
     fig, axs = plt.subplots()
-    axs.plot([x * 10 for x in range(1, 151)], binned_ordered_list)
+    axs.plot([x * bin_factor for x in index_list], binned_ordered_list)
+    axs.plot([x * bin_factor for x in index_list], rolling_average)
+    # axs.hist(df.UTR_length.values, bins=num_bins+1)
     plt.show()
 
 
@@ -111,7 +124,7 @@ if __name__ == '__main__':
     # Print basics
     info_print_df(df, title="All UTRs")
 
-    # Fix headers, try to simplify data-types, pool anything above max to max
+    # Fix headers, try to simplify data-types, pool anything above max_value to max_value
     df = mess_w_df(df, column_headers, max_value=1500)
 
     # Print basics post max cut off
@@ -119,22 +132,4 @@ if __name__ == '__main__':
 
     # Going to try and pre-bin data,
     # this will allow for an eventual simple moving average to plot as a line
-    binned_series = pd.cut(df.UTR_length, bins=150, labels=range(1, 151)).value_counts()
-    binned_ordered_series = binned_series.sort_index()
-    binned_ordered_list = binned_ordered_series.values
-    print(f'Binned Series:\n{binned_series}\n\n'
-          f'Binned Ordered Series:\n{binned_ordered_series}\n\n'
-          f'Binned Ordered List:\n{binned_ordered_list}')
-    print()
-    #print(binned_UTR_lengths[0])
-
-    # Print 0 value reads
-    # print(df[df.UTR_length == 0])
-
-    # Plot histogram
-    # quick_plot_histo([df['UTR_length']], number_of_bins=150, maximum=1500)
-
-    # Plot Binned Data!
-    fig, axs = plt.subplots()
-    axs.plot([x * 10 for x in range(1, 151)], binned_ordered_list)
-    plt.show()
+    bin_and_plot_df(df, 1500)
