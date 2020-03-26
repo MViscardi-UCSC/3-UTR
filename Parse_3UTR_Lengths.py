@@ -56,10 +56,6 @@ def mess_w_df(df, column_headers, max_value):
     return df
 
 
-def head_print_df(df, head=50):
-    print(df.head(head))
-
-
 def info_print_df(df, title: str = ''):
     if title:
         print(f'{title}:\n\tMax Length:{df.UTR_length.max():>6}\n\t'
@@ -93,27 +89,36 @@ def quick_plot_histo(variable: iter,
     plt.show()
 
 
-def bin_and_plot_df(df, num_bins):
+def bin_and_plot_df(df, num_bins, rolling_window_size):
     """"""
     # Tuple with the range of numbers that are basically the indexes of our bins
     index_list = range(1, num_bins+1)
     binned_series = pd.cut(df.UTR_length, bins=num_bins, labels=index_list).value_counts()
     binned_ordered_series = binned_series.sort_index()
 
-    rolling_average = binned_ordered_series.rolling(10, min_periods=1).mean()
-    print(rolling_average)
-
+    rolling_average = binned_ordered_series.rolling(rolling_window_size,
+                                                    center=True,
+                                                    min_periods=int(rolling_window_size/2)
+                                                    ).mean()
+    # Converting to a list makes it easier to pass into MatPlotLib
     binned_ordered_list = binned_ordered_series.values
 
-    # print(binned_series, binned_ordered_series, binned_ordered_list)
-
+    # bin_factor allows us to translate the bin indexes back to the UTR_length values
     bin_factor = int(df.UTR_length.max() / num_bins)
 
     # Plot Binned Data!
     fig, axs = plt.subplots()
-    axs.plot([x * bin_factor for x in index_list], binned_ordered_list)
-    axs.plot([x * bin_factor for x in index_list], rolling_average)
-    # axs.hist(df.UTR_length.values, bins=num_bins+1)
+    # axs.plot([x * bin_factor for x in index_list], binned_ordered_list)
+    axs.plot([x * bin_factor for x in index_list],
+             rolling_average,
+             label=f"Simple Moving Average, window={rolling_window_size}")
+    axs.hist(df.UTR_length.values,
+             bins=num_bins,
+             label=f"Binned Histogram, bins={num_bins}")
+    axs.legend()
+    axs.set_title("3' UTR reads from C.H. Jan et al. 2010")
+    plt.xlabel(f"3' UTR Lengths (nt)")  # TODO: Change this to 'fraction of reads'
+    plt.ylabel(f"Number of UTRs Counted,\nn={df.size}")
     plt.show()
 
 
@@ -127,9 +132,6 @@ if __name__ == '__main__':
     # Fix headers, try to simplify data-types, pool anything above max_value to max_value
     df = mess_w_df(df, column_headers, max_value=1500)
 
-    # Print basics post max cut off
-    # info_print_df(df, title="Max Cut UTRs")
-
     # Going to try and pre-bin data,
     # this will allow for an eventual simple moving average to plot as a line
-    bin_and_plot_df(df, 1500)
+    bin_and_plot_df(df, 150, 3)
