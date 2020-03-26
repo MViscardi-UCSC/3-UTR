@@ -147,4 +147,4 @@ if __name__ == '__main__':
 
     # Bin data with pandas.cut, make a simple moving average of binned data,
     # and blot against data binned by matplotlib
-    bin_and_plot_df(df, 300, 3)
+    bin_and_plot_df(df, 500, 5)
