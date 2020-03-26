@@ -42,6 +42,11 @@ def make_pandas_df(file, sep='\t', header=3):
     return df
 
 
+def hardcode_make_df():
+    """This is only for the use with timeit"""
+    return make_pandas_df("NIHMS249209-supplement-5.txt")
+
+
 def mess_w_df(df, column_headers, max_value):
     # Rename the columns...
     # because I don't know how else to get rid of hash-tag in front of IDs
@@ -91,30 +96,38 @@ def quick_plot_histo(variable: iter,
 
 def bin_and_plot_df(df, num_bins, rolling_window_size):
     """"""
-    # Tuple with the range of numbers that are basically the indexes of our bins
+    # Tuple with the range of numbers that are basically the indexes of our bins (+1)
     index_list = range(1, num_bins+1)
+    # bin our values into num_bins bins
     binned_series = pd.cut(df.UTR_length, bins=num_bins, labels=index_list).value_counts()
+    # reorder binned series based on indexes (which correspond to UTR length here)
     binned_ordered_series = binned_series.sort_index()
-
+    # find moving average for each bin
     rolling_average = binned_ordered_series.rolling(rolling_window_size,
                                                     center=True,
                                                     min_periods=int(rolling_window_size/2)
                                                     ).mean()
-    # Converting to a list makes it easier to pass into MatPlotLib
-    binned_ordered_list = binned_ordered_series.values
-
+    # # Converting to a list makes it easier to pass into MatPlotLib
+    # binned_ordered_list = binned_ordered_series.values
     # bin_factor allows us to translate the bin indexes back to the UTR_length values
     bin_factor = int(df.UTR_length.max() / num_bins)
 
-    # Plot Binned Data!
     fig, axs = plt.subplots()
+    # # plot binned data
     # axs.plot([x * bin_factor for x in index_list], binned_ordered_list)
+
+    # plot moving average
     axs.plot([x * bin_factor for x in index_list],
              rolling_average,
-             label=f"Simple Moving Average, window={rolling_window_size}")
+             label=f"Simple Moving Average, window={rolling_window_size}",
+             linewidth=2.3, color=(0/255, 114/255, 178/255, 255/255))
+
+    # plot histogram with data binned independently by matplotlib (slow)
     axs.hist(df.UTR_length.values,
              bins=num_bins,
-             label=f"Binned Histogram, bins={num_bins}")
+             label=f"Binned Histogram, bins={num_bins}",
+             color=(213/255, 94/255, 0/255, 255/255))
+
     axs.legend()
     axs.set_title("3' UTR reads from C.H. Jan et al. 2010")
     plt.xlabel(f"3' UTR Lengths (nt)")  # TODO: Change this to 'fraction of reads'
@@ -132,6 +145,6 @@ if __name__ == '__main__':
     # Fix headers, try to simplify data-types, pool anything above max_value to max_value
     df = mess_w_df(df, column_headers, max_value=1500)
 
-    # Going to try and pre-bin data,
-    # this will allow for an eventual simple moving average to plot as a line
-    bin_and_plot_df(df, 150, 3)
+    # Bin data with pandas.cut, make a simple moving average of binned data,
+    # and blot against data binned by matplotlib
+    bin_and_plot_df(df, 300, 3)
