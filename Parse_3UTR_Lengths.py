@@ -35,6 +35,7 @@ column_headers = ['entrez_ID',
 
 
 # The following functions just help legibility for main()
+# Parse the sup data file
 def make_pandas_df(file, sep='\t', header=3):
     with open(file, "r") as file:
         # This is a huge step. Pandas quickly converts the whole text file into a Dataframe
@@ -42,11 +43,13 @@ def make_pandas_df(file, sep='\t', header=3):
     return df
 
 
+# for use with timeit
 def hardcode_make_df():
     """This is only for the use with timeit"""
     return make_pandas_df("NIHMS249209-supplement-5.txt")
 
 
+# rename columns and cut off anything larger than max_value
 def mess_w_df(df, column_headers, max_value):
     # Rename the columns...
     # because I don't know how else to get rid of hash-tag in front of IDs
@@ -61,6 +64,7 @@ def mess_w_df(df, column_headers, max_value):
     return df
 
 
+# used as needed to print df info
 def info_print_df(df, title: str = ''):
     if title:
         print(f'{title}:\n\tMax Length:{df.UTR_length.max():>6}\n\t'
@@ -72,12 +76,14 @@ def info_print_df(df, title: str = ''):
               f'\t\tN = {df.size}')
 
 
+# used as needed to return two separate dataframes of sense and antisense
 def filter_sense(df):
     sense = df[df.sense == '+']
     anti_sense = df[df.sense == '-']
     return sense, anti_sense
 
 
+# no longer used - would bin and plot data using matplotlib
 def quick_plot_histo(variable: iter,
                      number_of_bins: int = 5000,
                      maximum: int = None):
@@ -94,6 +100,7 @@ def quick_plot_histo(variable: iter,
     plt.show()
 
 
+# bin data and calculate moving average with pandas, plot against histo with matplotlib
 def bin_and_plot_df(df, num_bins, rolling_window_size):
     """"""
     # Tuple with the range of numbers that are basically the indexes of our bins (+1)
