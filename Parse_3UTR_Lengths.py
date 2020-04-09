@@ -131,7 +131,7 @@ def bin_and_plot_df(df, num_bins, rolling_window_size):
     axs.legend()
     axs.set_title("3' UTR reads from C.H. Jan et al. 2010")
     plt.xlabel(f"3' UTR Lengths (nt)")  # TODO: Change this to 'fraction of reads'
-    plt.ylabel(f"Number of UTRs Counted,\nn={df.size}")
+    plt.ylabel(f"Number of UTRs Counted,\nn={df.shape[0]}")
     plt.show()
 
 
@@ -140,7 +140,12 @@ if __name__ == '__main__':
     df = make_pandas_df("NIHMS249209-supplement-5.txt")
 
     # Print basics
-    info_print_df(df, title="All UTRs")
+    # info_print_df(df, title="All UTRs")
+
+    # Print zero length UTRs
+    # print(df[df.UTR_length == 0].sort_values("chromosome"))
+    # print(df.sort_values(["chromosome", "UTR_start"]))
+    print(df.info())
 
     # Fix headers, try to simplify data-types, pool anything above max_value to max_value
     df = mess_w_df(df, column_headers, max_value=1500)
